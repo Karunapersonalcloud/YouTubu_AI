@@ -15,9 +15,9 @@ services:
       - N8N_RESTRICT_FILE_ACCESS_TO=
       - TZ=Asia/Kolkata
     volumes:
-      - F:/YouTubu_AI:/data
-      - F:/YouTubu_AI/n8n/n8n_data:/home/node/.n8n
-      - F:/YouTubu_AI/n8n/n8n-files:/home/node/.n8n-files
+      - .:/data
+      - ./n8n/n8n_data:/home/node/.n8n
+      - ./n8n/n8n-files:/home/node/.n8n-files
 
   # New: FastAPI Backend
   backend:
@@ -28,8 +28,8 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - F:/YouTubu_AI:/data
-      - F:/YouTubu_AI/webapp/backend:/app
+      - .:/data
+      - ./webapp/backend:/app
     environment:
       - TZ=Asia/Kolkata
       - BASE_DIR=/data
@@ -44,7 +44,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - F:/YouTubu_AI/webapp/frontend:/app
+      - ./webapp/frontend:/app
       - /app/node_modules
     environment:
       - VITE_API_BASE=http://localhost:8000/api

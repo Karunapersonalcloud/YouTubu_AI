@@ -51,10 +51,13 @@ ollama pull llama3.1:8b
 
 ```powershell
 # Clone the repo
-git clone https://github.com/<YOUR_USERNAME>/YouTubu_AI.git
+git clone https://github.com/Karunapersonalcloud/YouTubu_AI.git
 cd YouTubu_AI
 
-# Start everything
+# Run the setup script (creates folders, starts Docker, imports n8n workflow)
+.\SETUP.bat
+
+# OR manually:
 docker-compose -f docker-compose.web.yml up --build -d
 
 # Open in browser

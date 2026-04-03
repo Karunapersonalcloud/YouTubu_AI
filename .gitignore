@@ -17,6 +17,8 @@ tools/piper/
 # ── n8n runtime data (credentials, DB, executions) ──
 n8n/n8n_data/
 n8n/n8n-files/
+n8n/workflow_export.json
+n8n/export_workflow.js
 
 # ── Generated videos & media (too large for git) ──
 videos/

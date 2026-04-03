@@ -11,15 +11,15 @@ services:
       - NODE_FUNCTION_ALLOW_EXTERNAL=*
       - TZ=Asia/Kolkata
     volumes:
-      - F:/YouTubu_AI:/data
-      - F:/YouTubu_AI/n8n/n8n_data:/home/node/.n8n
-      - F:/YouTubu_AI/n8n/n8n-files:/home/node/.n8n-files
+      - .:/data
+      - ./n8n/n8n_data:/home/node/.n8n
+      - ./n8n/n8n-files:/home/node/.n8n-files
 
   agent:
     build: ./agent
     container_name: yt_agent_worker
     volumes:
-      - F:/YouTubu_AI:/data
+      - .:/data
     environment:
       - TZ=Asia/Kolkata
     # This container stays idle; n8n will trigger it via docker exec
