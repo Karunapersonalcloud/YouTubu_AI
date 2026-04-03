@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # Original n8n service
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: yt_agent_n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - NODE_FUNCTION_ALLOW_EXTERNAL=*
+      - N8N_RESTRICT_FILE_ACCESS_TO=
+      - TZ=Asia/Kolkata
+    volumes:
+      - F:/YouTubu_AI:/data
+      - F:/YouTubu_AI/n8n/n8n_data:/home/node/.n8n
+      - F:/YouTubu_AI/n8n/n8n-files:/home/node/.n8n-files
+
+  # New: FastAPI Backend
+  backend:
+    build:
+      context: ./webapp/backend
+      dockerfile: Dockerfile
+    container_name: yt_agent_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - F:/YouTubu_AI:/data
+      - F:/YouTubu_AI/webapp/backend:/app
+    environment:
+      - TZ=Asia/Kolkata
+      - BASE_DIR=/data
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  # New: React Frontend
+  frontend:
+    build:
+      context: ./webapp/frontend
+      dockerfile: Dockerfile
+    container_name: yt_agent_frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - F:/YouTubu_AI/webapp/frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_BASE=http://localhost:8000/api
+    command: ["npm", "run", "dev"]
+    depends_on:
+      - backend

@@ -1,0 +1,15 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-dotenv==1.0.1
+requests==2.32.3
+pydub==0.25.1
+rich==13.9.4
+tqdm==4.67.1
+
+# For YouTube upload (official Google client)
+google-api-python-client==2.162.0
+google-auth==2.38.0
+google-auth-oauthlib==1.2.1
+
+# Optional (used if you enable Pexels)
+aiohttp==3.11.12

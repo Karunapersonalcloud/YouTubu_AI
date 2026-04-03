@@ -1,0 +1,60 @@
+# ── Python ──
+.venv/
+.venv_tts/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# ── Node / Frontend ──
+node_modules/
+webapp/frontend/dist/
+
+# ── Tools / Binaries (users download separately) ──
+tools/ffmpeg/
+tools/piper/
+
+# ── n8n runtime data (credentials, DB, executions) ──
+n8n/n8n_data/
+n8n/n8n-files/
+
+# ── Generated videos & media (too large for git) ──
+videos/
+output/
+assets/stock_cache/
+assets/thumbs/
+assets/music/*.mp3
+assets/music/*.wav
+
+# ── Voice training data & models ──
+voice/dataset/
+voice/models/
+
+# ── Logs & run artifacts ──
+logs/
+runs/
+
+# ── OAuth / secrets ──
+config/oauth/
+*.env
+.env
+.env.*
+
+# ── OS / IDE ──
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+*.code-workspace
+
+# ── Docker runtime ──
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# ── Misc ──
+*.bak*
+*.bak_*
+n8n_workflow_export.json

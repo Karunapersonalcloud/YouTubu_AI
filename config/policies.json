@@ -1,0 +1,13 @@
+{
+  "hard_block_topics": [
+    "movie clips", "tv clips", "sports clips", "copyrighted music",
+    "political persuasion", "elections", "medical cures", "hate/harassment",
+    "adult/sexual content", "graphic violence", "guaranteed income claims"
+  ],
+  "required": [
+    "original script",
+    "transformative editing (captions + narration + structure)",
+    "royalty-free assets only",
+    "title/thumbnail must match content"
+  ]
+}

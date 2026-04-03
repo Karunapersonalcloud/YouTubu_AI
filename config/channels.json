@@ -1,0 +1,16 @@
+{
+  "edgeviralhub": {
+    "language": "en",
+    "timezone": "Asia/Kolkata",
+    "daily": { "long": 1, "short": 1 },
+    "niche": "AI tools, productivity, career skills, make-money-with-ai (educational)",
+    "upload": { "short_time": "12:30", "long_time": "20:30" }
+  },
+  "manatelugodu": {
+    "language": "te",
+    "timezone": "Asia/Kolkata",
+    "daily": { "long": 1, "short": 1 },
+    "niche": "AI explained in Telugu, career, motivation, practical tech awareness",
+    "upload": { "short_time": "12:45", "long_time": "20:45" }
+  }
+}

@@ -1,0 +1,148 @@
+# ONE_CLICK_SETUP.ps1
+# Creates the full YouTube Agent workspace and starts services.
+# Run as: Right-click -> Run with PowerShell (preferably as Admin)
+
+$Root = "F:\YouTubu_AI"
+$ErrorActionPreference = "Stop"
+
+Write-Host "=== YouTube AI Agent: One-Click Setup ===" -ForegroundColor Cyan
+Write-Host "Root: $Root"
+
+# 0) Ensure root folder
+New-Item -ItemType Directory -Force -Path $Root | Out-Null
+
+# 1) Project structure
+$dirs = @(
+  "config\prompts",
+  "runs",
+  "assets\stock_cache",
+  "assets\music",
+  "assets\fonts",
+  "assets\thumbs",
+  "voice\dataset\en",
+  "voice\dataset\te",
+  "voice\models",
+  "output\edgeviralhub",
+  "output\manatelugodu",
+  "scripts",
+  "logs",
+  "n8n"
+)
+foreach ($d in $dirs) { New-Item -ItemType Directory -Force -Path (Join-Path $Root $d) | Out-Null }
+
+# 2) Basic config placeholders
+$channelsJson = @"
+{
+  "edgeviralhub": {
+    "language": "en",
+    "timezone": "Asia/Kolkata",
+    "daily": { "long": 1, "short": 1 },
+    "niche": "AI tools, productivity, career skills, make-money-with-ai (educational)",
+    "upload": { "short_time": "12:30", "long_time": "20:30" }
+  },
+  "manatelugodu": {
+    "language": "te",
+    "timezone": "Asia/Kolkata",
+    "daily": { "long": 1, "short": 1 },
+    "niche": "AI explained in Telugu, career, motivation, practical tech awareness",
+    "upload": { "short_time": "12:45", "long_time": "20:45" }
+  }
+}
+"@
+Set-Content -Encoding UTF8 -Path (Join-Path $Root "config\channels.json") -Value $channelsJson
+
+$policiesJson = @"
+{
+  "hard_block_topics": [
+    "movie clips", "tv clips", "sports clips", "copyrighted music",
+    "political persuasion", "elections", "medical cures", "hate/harassment",
+    "adult/sexual content", "graphic violence", "guaranteed income claims"
+  ],
+  "required": [
+    "original script",
+    "transformative editing (captions + narration + structure)",
+    "royalty-free assets only",
+    "title/thumbnail must match content"
+  ]
+}
+"@
+Set-Content -Encoding UTF8 -Path (Join-Path $Root "config\policies.json") -Value $policiesJson
+
+# 3) Create docker-compose for n8n (local)
+$compose = @"
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: yt_agent_n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - TZ=Asia/Kolkata
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_DIAGNOSTICS_ENABLED=false
+    volumes:
+      - ./n8n_data:/home/node/.n8n
+      - F:/YouTubu_AI:/data
+    restart: unless-stopped
+"@
+$composePath = Join-Path $Root "n8n\docker-compose.yml"
+Set-Content -Encoding UTF8 -Path $composePath -Value $compose
+
+# 4) Install prerequisites (best effort, non-fatal if already installed)
+function Try-Run($cmd) {
+  try { iex $cmd; return $true } catch { Write-Host "WARN: $cmd failed: $($_.Exception.Message)" -ForegroundColor Yellow; return $false }
+}
+
+# Winget check
+$hasWinget = $false
+try { winget --version | Out-Null; $hasWinget = $true } catch { $hasWinget = $false }
+
+if ($hasWinget) {
+  Write-Host "Installing/Checking: Python, Git, FFmpeg, Docker Desktop (winget)..." -ForegroundColor Cyan
+  Try-Run 'winget install -e --id Python.Python.3.11 --accept-package-agreements --accept-source-agreements'
+  Try-Run 'winget install -e --id Git.Git --accept-package-agreements --accept-source-agreements'
+  Try-Run 'winget install -e --id Gyan.FFmpeg --accept-package-agreements --accept-source-agreements'
+  Try-Run 'winget install -e --id Docker.DockerDesktop --accept-package-agreements --accept-source-agreements'
+} else {
+  Write-Host "Winget not found. Skipping auto-installs. Please ensure Python 3.11 + Docker Desktop + FFmpeg are installed." -ForegroundColor Yellow
+}
+
+# 5) Python venv + deps (inside F:\YouTubu_AI)
+Write-Host "Setting up Python venv..." -ForegroundColor Cyan
+$venvPath = Join-Path $Root ".venv"
+Try-Run "py -3.11 -m venv `"$venvPath`""
+$pip = Join-Path $venvPath "Scripts\pip.exe"
+$python = Join-Path $venvPath "Scripts\python.exe"
+Try-Run "`"$pip`" install --upgrade pip"
+Try-Run "`"$pip`" install requests python-dotenv pydub tqdm rich"
+
+# 6) Create starter scripts placeholders (safe skeletons)
+$starter = @"
+# START_AGENT.ps1
+# Starts n8n + opens the UI.
+Set-Location "F:\YouTubu_AI\n8n"
+docker compose up -d
+Start-Sleep -Seconds 2
+Start-Process "http://localhost:5678"
+Write-Host "n8n started: http://localhost:5678"
+Write-Host "Workspace mounted at: F:\YouTubu_AI (inside container at /data)"
+"@
+Set-Content -Encoding UTF8 -Path (Join-Path $Root "START_AGENT.ps1") -Value $starter
+
+$bat = @"
+@echo off
+set ROOT=F:\YouTubu_AI
+powershell -ExecutionPolicy Bypass -File "%ROOT%\START_AGENT.ps1"
+pause
+"@
+Set-Content -Encoding ASCII -Path (Join-Path $Root "START_YT_AGENT.bat") -Value $bat
+
+# 7) Final message
+Write-Host ""
+Write-Host "=== DONE ===" -ForegroundColor Green
+Write-Host "Next: Double-click F:\YouTubu_AI\START_YT_AGENT.bat to open n8n."
+Write-Host "Then we will import the ready workflow + connect YouTube OAuth + add your voice reference audio."
+

@@ -1,0 +1,19 @@
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: yt_agent_n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_FILESYSTEM_ALLOWED_PATHS=/files,/home/node/.n8n-files
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - TZ=Asia/Kolkata
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_DIAGNOSTICS_ENABLED=false
+    volumes:
+      - ./n8n_data:/home/node/.n8n
+      - F:/YouTubu_AI:/data
+    restart: unless-stopped
+
